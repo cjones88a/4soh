@@ -1,0 +1,90 @@
+// Datasource and generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum SegmentType {
+  OVERALL
+  DOWNHILL
+  CLIMB
+}
+
+enum Lane {
+  A
+  B
+  NONE
+}
+
+// Models
+model Athlete {
+  id              String       @id @default(cuid())
+  name            String?
+  stravaAthleteId Int          @unique
+  createdAt       DateTime     @default(now())
+  efforts         Effort[]
+  tokens          StravaToken?
+}
+
+model StravaToken {
+  id           String   @id @default(cuid())
+  athleteId    String   @unique
+  accessToken  String
+  refreshToken String
+  expiresAt    Int      // unix seconds
+  tokenScope   String?
+  updatedAt    DateTime @default(now()) @updatedAt
+  athlete      Athlete  @relation(fields: [athleteId], references: [id])
+}
+
+model Season {
+  id     String  @id @default(cuid())
+  year   Int     @unique
+  stages Stage[]
+}
+
+model Stage {
+  id       String   @id @default(cuid())
+  seasonId String
+  name     String
+  startsOn DateTime
+  endsOn   DateTime
+  season   Season   @relation(fields: [seasonId], references: [id])
+  efforts  Effort[]
+  
+  @@unique([seasonId, name])
+}
+
+model Segment {
+  id              String       @id @default(cuid())
+  name            String
+  stravaSegmentId Int          @unique
+  type            SegmentType
+  lane            Lane         @default(NONE)
+  efforts         Effort[]
+}
+
+model Effort {
+  id             String   @id @default(cuid())
+  athleteId      String
+  stageId        String
+  segmentId      String
+  stravaEffortId Int      @unique
+  activityId     Int
+  activityDate   DateTime
+  elapsedSec     Int
+  isValid        Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  athlete Athlete @relation(fields: [athleteId], references: [id])
+  stage   Stage   @relation(fields: [stageId], references: [id])
+  segment Segment @relation(fields: [segmentId], references: [id])
+
+  @@index([stageId, segmentId])
+  @@index([athleteId, stageId, segmentId])
+}
