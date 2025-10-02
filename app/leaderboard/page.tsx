@@ -59,7 +59,7 @@ export default function LeaderboardPage() {
 
   const currentData = mockData[activeTab as keyof typeof mockData] || [];
 
-  function Table({ data, isSeasonTotal = false }: { data: any[], isSeasonTotal?: boolean }) {
+  function Table({ data, isSeasonTotal = false }: { data: Array<{rank: number, name: string, time?: string, totalTime?: string, date?: string, stravaLink?: string, stagesCompleted?: number}>, isSeasonTotal?: boolean }) {
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">

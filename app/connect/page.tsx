@@ -1,6 +1,7 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import Link from 'next/link';
 
 function ConnectContent() {
   const params = useSearchParams();
@@ -26,12 +27,12 @@ function ConnectContent() {
               <p className="text-sm text-gray-600 mb-4">
                 Your Strava activities will now be automatically tracked for the race leaderboard.
               </p>
-              <a 
+              <Link 
                 href="/" 
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
                 View Leaderboard
-              </a>
+              </Link>
             </div>
           ) : (
             <div className="text-center">
@@ -58,7 +59,7 @@ function ConnectContent() {
               </button>
               
               <div className="mt-6 text-xs text-gray-500">
-                <p>We'll only access your activity data to track race times.</p>
+                <p>We&apos;ll only access your activity data to track race times.</p>
                 <p>You can disconnect at any time.</p>
               </div>
             </div>
