@@ -47,7 +47,7 @@ export default async function LeaderboardPage() {
                 <tr key={r.stravaEffortId ?? r.athleteId} className="border-b hover:bg-gray-50">
                   <td className="py-2 pr-4">{idx + 1}</td>
                   <td className="py-2 pr-4">{r.athleteName}</td>
-                  <td className="py-2 pr-4">{secondsToHMS(r.elapsedSec ?? r.totalElapsedSec)}</td>
+                  <td className="py-2 pr-4">{secondsToHMS(r.elapsedSec ?? r.totalElapsedSec ?? 0)}</td>
                   <td className="py-2 pr-4">{r.activityDate ? new Date(r.activityDate).toLocaleDateString() : '-'}</td>
                   <td className="py-2 pr-4">{r.activityId ? <a className="text-blue-600 underline" href={`https://www.strava.com/activities/${r.activityId}`} target="_blank">View</a> : '-'}</td>
                 </tr>
