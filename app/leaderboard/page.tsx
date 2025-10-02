@@ -2,6 +2,8 @@ import { prisma } from '@/lib/db';
 import { getBestPerAthleteByStageAndSegment, getSeasonTotalOverall } from '@/lib/leaderboard';
 import { SEGMENTS } from '@/config/segments';
 
+export const dynamic = 'force-dynamic';
+
 function secondsToHMS(total: number) {
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
