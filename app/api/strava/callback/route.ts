@@ -1,13 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForToken } from '@/lib/strava';
 import { prisma } from '@/lib/db';
+import { cookies } from 'next/headers';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
+  const state = searchParams.get('state');
   const error = searchParams.get('error');
+  
   if (error) return NextResponse.json({ error }, { status: 400 });
   if (!code) return NextResponse.json({ error: 'Missing code' }, { status: 400 });
+
+  // Validate state parameter for CSRF protection
+  const storedState = cookies().get('oauth_state')?.value;
+  if (!state || !storedState || state !== storedState) {
+    return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 });
+  }
+
+  // Clear the state cookie
+  cookies().delete('oauth_state');
 
   const clientId = process.env.STRAVA_CLIENT_ID!;
   const clientSecret = process.env.STRAVA_CLIENT_SECRET!;
