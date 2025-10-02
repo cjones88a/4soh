@@ -72,13 +72,14 @@ async function fetchAndStoreSegmentData() {
     // Process each effort
     for (const effort of efforts) {
       try {
-        // Create or update athlete
+        // Create or update athlete (using a placeholder ID since we don't have athlete info in segment efforts)
+        const athleteId = Math.floor(Math.random() * 1000000); // Generate a random ID for now
         const athlete = await prisma.athlete.upsert({
-          where: { stravaAthleteId: effort.activity.athlete?.id || 0 },
+          where: { stravaAthleteId: athleteId },
           update: {},
           create: { 
-            stravaAthleteId: effort.activity.athlete?.id || 0,
-            name: `Athlete ${effort.activity.athlete?.id || 'Unknown'}`,
+            stravaAthleteId: athleteId,
+            name: `Athlete ${athleteId}`,
           },
         });
 
