@@ -40,7 +40,7 @@ export async function GET(req: Request) {
 
     const name = [tokens.athlete?.firstname, tokens.athlete?.lastname].filter(Boolean).join(' ').trim() || tokens.athlete?.username || String(athleteId);
 
-    const athlete = await prisma.athlete.upsert({
+    await prisma.athlete.upsert({
       where: { stravaAthleteId: String(athleteId) },
       update: { name },
       create: { stravaAthleteId: String(athleteId), name },
@@ -62,7 +62,8 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.redirect('/connect?connected=true');
-  } catch (e: any) {
-    return NextResponse.json({ error: 'OAuth failed', details: e?.message ?? String(e) }, { status: 500 });
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: 'OAuth failed', details: errorMessage }, { status: 500 });
   }
 }
