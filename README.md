@@ -1,6 +1,6 @@
 # Race Tracker MVP
 
-Production-ready MVP for a standalone race-tracking site embeddable via `<iframe>`.
+Production-ready MVP for a standalone race-tracking site embeddable via `<iframe>` in the [4SOH project](https://github.com/cjones88a/4soh.git).
 
 ## Stack
 - Next.js (App Router, TypeScript)
@@ -70,6 +70,23 @@ curl -X POST http://localhost:3000/api/strava/webhook \
 ## Embedding
 Headers set in `next.config.js` to allow iframe embedding (`X-Frame-Options: ALLOWALL`, `CSP frame-ancestors *`).
 
+## Embedding in 4SOH.org
+
+Once deployed, embed the race tracker in your 4SOH project:
+
+```html
+<iframe 
+  src="https://your-race-tracker.vercel.app/leaderboard" 
+  width="100%" 
+  height="800px"
+  frameborder="0"
+  title="Race Leaderboards">
+</iframe>
+```
+
+See `DEPLOYMENT.md` for detailed deployment and embedding instructions.
+
 ## Notes
 - Configure `config/stages.ts` and `config/segments.ts` with real values.
 - Add Supabase Auth gating on admin endpoints before production.
+- Strava credentials are configured and ready for use.
