@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:setup": "tsx scripts/setup-db.ts",
     "db:push": "prisma db push",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "fetch-strava": "tsx scripts/fetch-strava-data.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
