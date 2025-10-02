@@ -6,8 +6,8 @@ export async function GET() {
     return NextResponse.json({ error: 'Missing STRAVA_CLIENT_ID' }, { status: 500 });
   }
   
-  // Use the current production URL directly
-  const redirectUri = 'https://race-tracker-b4zfexs2y-cjones88as-projects.vercel.app/api/strava/callback';
+  // Use the current production URL directly - no environment variable to avoid line breaks
+  const redirectUri = 'https://race-tracker-mb6mlvmq9-cjones88as-projects.vercel.app/api/strava/callback';
   
   const params = new URLSearchParams({
     client_id: clientId.trim(),
