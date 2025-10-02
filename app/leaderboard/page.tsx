@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/db';
 import { getBestPerAthleteByStageAndSegment, getSeasonTotalOverall } from '@/lib/leaderboard';
-import { STAGE_WINDOWS } from '@/config/stages';
 import { SEGMENTS } from '@/config/segments';
 
 function secondsToHMS(total: number) {
@@ -28,7 +27,7 @@ export default async function LeaderboardPage() {
     stages.length && overall ? getSeasonTotalOverall(stages.map(s => s.id), await prisma.segment.findFirstOrThrow({ where: { stravaSegmentId: overall } }).then(s => s.id)) : Promise.resolve([]),
   ]);
 
-  function Table({ title, rows }: { title: string; rows: any[] }) {
+  function Table({ title, rows }: { title: string; rows: Array<{ athleteName: string; athleteId: string; elapsedSec?: number; totalElapsedSec?: number; activityDate?: Date; stravaEffortId?: number; activityId?: number }> }) {
     return (
       <div>
         <h2 className="text-xl font-semibold mt-6 mb-2">{title}</h2>
@@ -82,7 +81,7 @@ export default async function LeaderboardPage() {
               </tr>
             </thead>
             <tbody>
-              {seasonTotals.map((r: any, idx: number) => (
+              {seasonTotals.map((r, idx: number) => (
                 <tr key={r.athleteId} className="border-b hover:bg-gray-50">
                   <td className="py-2 pr-4">{idx + 1}</td>
                   <td className="py-2 pr-4">{r.athleteName}</td>

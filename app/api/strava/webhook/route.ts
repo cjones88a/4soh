@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
         },
       });
       accessToken = refreshed.access_token;
-    } catch (e) {
+    } catch {
       return NextResponse.json({ ok: true });
     }
   }
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
             elapsedSec: eff.elapsed_time,
           },
         });
-      } catch (e) {
+      } catch {
         // ignore duplicates or minor errors
       }
     }

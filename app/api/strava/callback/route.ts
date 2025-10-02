@@ -45,7 +45,8 @@ export async function GET(req: NextRequest) {
     const redirect = new URL('/connect?connected=1', req.nextUrl.origin);
     redirect.searchParams.set('name', encodeURIComponent(name));
     return NextResponse.redirect(redirect);
-  } catch (e: any) {
-    return NextResponse.json({ error: 'OAuth failed', details: e?.message ?? String(e) }, { status: 500 });
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: 'OAuth failed', details: errorMessage }, { status: 500 });
   }
 }
