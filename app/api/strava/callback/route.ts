@@ -13,13 +13,14 @@ export async function GET(req: NextRequest) {
   if (!code) return NextResponse.json({ error: 'Missing code' }, { status: 400 });
 
   // Validate state parameter for CSRF protection
-  const storedState = cookies().get('oauth_state')?.value;
+  const cookieStore = await cookies();
+  const storedState = cookieStore.get('oauth_state')?.value;
   if (!state || !storedState || state !== storedState) {
     return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 });
   }
 
   // Clear the state cookie
-  cookies().delete('oauth_state');
+  cookieStore.delete('oauth_state');
 
   const clientId = process.env.STRAVA_CLIENT_ID!;
   const clientSecret = process.env.STRAVA_CLIENT_SECRET!;

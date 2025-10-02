@@ -20,7 +20,8 @@ export async function GET() {
   const state = randomUUID();
   
   // Store state in secure cookie
-  cookies().set('oauth_state', state, {
+  const cookieStore = await cookies();
+  cookieStore.set('oauth_state', state, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
