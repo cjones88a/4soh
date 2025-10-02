@@ -9,7 +9,7 @@ export async function GET() {
   }
   
   // Use environment variable with fallback for flexibility
-  const redirectUri = process.env.STRAVA_REDIRECT_URI || 'https://race-tracker-mb6mlvmq9-cjones88as-projects.vercel.app/api/strava/callback';
+  const redirectUri = process.env.STRAVA_REDIRECT_URI || 'https://race-tracker-gqbzmxkys-cjones88as-projects.vercel.app/api/strava/callback';
   
   // Validate redirect URI in production
   if (process.env.NODE_ENV === 'production' && !redirectUri.startsWith('https://')) {
@@ -33,7 +33,7 @@ export async function GET() {
     response_type: 'code',
     redirect_uri: redirectUri,
     approval_prompt: 'auto',
-    scope: 'profile:read,activity:read,activity:read_all', // Updated scopes
+    scope: 'read,activity:read,activity:read_all', // Working scopes
     state: state, // CSRF protection
   });
   const url = `https://www.strava.com/oauth/authorize?${params.toString()}`;
