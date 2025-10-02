@@ -1,7 +1,8 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function ConnectPage() {
+function ConnectContent() {
   const params = useSearchParams();
   const connected = params.get('connected') === '1';
   const name = params.get('name') ? decodeURIComponent(params.get('name')!) : undefined;
@@ -19,5 +20,13 @@ export default function ConnectPage() {
         <button onClick={onConnect} className="px-4 py-2 rounded bg-black text-white hover:bg-gray-800">Connect Strava</button>
       )}
     </div>
+  );
+}
+
+export default function ConnectPage() {
+  return (
+    <Suspense fallback={<div className="max-w-md mx-auto p-6">Loading...</div>}>
+      <ConnectContent />
+    </Suspense>
   );
 }
