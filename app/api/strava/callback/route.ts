@@ -1,65 +1,68 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { exchangeCodeForToken } from '@/lib/strava';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { cookies } from 'next/headers';
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const code = searchParams.get('code');
-  const state = searchParams.get('state');
-  const error = searchParams.get('error');
-  
-  if (error) return NextResponse.json({ error }, { status: 400 });
-  if (!code) return NextResponse.json({ error: 'Missing code' }, { status: 400 });
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const code = url.searchParams.get('code');
+  const error = url.searchParams.get('error');
 
-  // Validate state parameter for CSRF protection
-  const cookieStore = await cookies();
-  const storedState = cookieStore.get('oauth_state')?.value;
-  if (!state || !storedState || state !== storedState) {
-    return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 });
-  }
-
-  // Clear the state cookie
-  cookieStore.delete('oauth_state');
+  if (error) return NextResponse.json({ error: 'OAuth error', details: error }, { status: 400 });
+  if (!code) return NextResponse.json({ error: 'No authorization code' }, { status: 400 });
 
   const clientId = process.env.STRAVA_CLIENT_ID!;
   const clientSecret = process.env.STRAVA_CLIENT_SECRET!;
+  const redirectUri = process.env.STRAVA_REDIRECT_URI!; // include in token exchange
 
   try {
-    const token = await exchangeCodeForToken({ clientId, clientSecret, code });
-    const athleteId = token.athlete?.id;
+    const body = new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      code,
+      grant_type: 'authorization_code',
+      redirect_uri: redirectUri, // REQUIRED to match authorize step
+    });
+
+    const tokenResponse = await fetch('https://www.strava.com/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+    });
+
+    const tokens = await tokenResponse.json();
+    if (!tokenResponse.ok) {
+      // Helpful logging while debugging:
+      console.error('Token exchange failed', tokenResponse.status, tokens);
+      return NextResponse.json({ error: 'Token exchange failed', details: tokens }, { status: 400 });
+    }
+
+    const athleteId = tokens.athlete?.id;
     if (!athleteId) return NextResponse.json({ error: 'No athlete in token' }, { status: 400 });
 
-    const name = [token.athlete?.firstname, token.athlete?.lastname].filter(Boolean).join(' ').trim() || token.athlete?.username || String(athleteId);
+    const name = [tokens.athlete?.firstname, tokens.athlete?.lastname].filter(Boolean).join(' ').trim() || tokens.athlete?.username || String(athleteId);
 
     const athlete = await prisma.athlete.upsert({
-      where: { stravaAthleteId: athleteId },
+      where: { stravaAthleteId: String(athleteId) },
       update: { name },
-      create: { stravaAthleteId: athleteId, name },
+      create: { stravaAthleteId: String(athleteId), name },
     });
 
     await prisma.stravaToken.upsert({
-      where: { athleteId: athlete.id },
+      where: { stravaAthleteId: String(athleteId) },
       update: {
-        accessToken: token.access_token,
-        refreshToken: token.refresh_token,
-        expiresAt: token.expires_at,
-        tokenScope: token.scope,
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        expiresAt: new Date(tokens.expires_at * 1000),
       },
       create: {
-        athleteId: athlete.id,
-        accessToken: token.access_token,
-        refreshToken: token.refresh_token,
-        expiresAt: token.expires_at,
-        tokenScope: token.scope,
+        stravaAthleteId: String(athleteId),
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        expiresAt: new Date(tokens.expires_at * 1000),
       },
     });
 
-    const redirect = new URL('/connect?connected=1', req.nextUrl.origin);
-    redirect.searchParams.set('name', encodeURIComponent(name));
-    return NextResponse.redirect(redirect);
-  } catch (e: unknown) {
-    const errorMessage = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ error: 'OAuth failed', details: errorMessage }, { status: 500 });
+    return NextResponse.redirect('/connect?connected=true');
+  } catch (e: any) {
+    return NextResponse.json({ error: 'OAuth failed', details: e?.message ?? String(e) }, { status: 500 });
   }
 }
