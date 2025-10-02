@@ -40,24 +40,24 @@ export async function GET(req: Request) {
 
     const name = [tokens.athlete?.firstname, tokens.athlete?.lastname].filter(Boolean).join(' ').trim() || tokens.athlete?.username || String(athleteId);
 
-    await prisma.athlete.upsert({
-      where: { stravaAthleteId: String(athleteId) },
+    const athlete = await prisma.athlete.upsert({
+      where: { stravaAthleteId: athleteId },
       update: { name },
-      create: { stravaAthleteId: String(athleteId), name },
+      create: { stravaAthleteId: athleteId, name },
     });
 
     await prisma.stravaToken.upsert({
-      where: { stravaAthleteId: String(athleteId) },
+      where: { athleteId: athlete.id },
       update: {
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
-        expiresAt: new Date(tokens.expires_at * 1000),
+        expiresAt: tokens.expires_at,
       },
       create: {
-        stravaAthleteId: String(athleteId),
+        athleteId: athlete.id,
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
-        expiresAt: new Date(tokens.expires_at * 1000),
+        expiresAt: tokens.expires_at,
       },
     });
 
