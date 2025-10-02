@@ -63,7 +63,7 @@ model Stage {
 model Segment {
   id              String       @id @default(cuid())
   name            String
-  stravaSegmentId Int          @unique
+  stravaSegmentId String       @unique
   type            SegmentType
   lane            Lane         @default(NONE)
   efforts         Effort[]

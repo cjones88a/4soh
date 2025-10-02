@@ -14,7 +14,7 @@ async function fetchAndStoreSegmentData() {
     return;
   }
 
-  const segmentId = SEGMENTS.OVERALL;
+  const segmentId = parseInt(SEGMENTS.OVERALL);
   const startDate = new Date('2025-09-01T00:00:00Z');
   const endDate = new Date('2025-09-30T23:59:59Z');
 
@@ -33,11 +33,11 @@ async function fetchAndStoreSegmentData() {
 
     // Create or update segment
     const segment = await prisma.segment.upsert({
-      where: { stravaSegmentId: segmentId },
+      where: { stravaSegmentId: SEGMENTS.OVERALL },
       update: {},
       create: {
         name: '4SOH Race Segment',
-        stravaSegmentId: segmentId,
+        stravaSegmentId: SEGMENTS.OVERALL,
         type: 'OVERALL',
         lane: 'NONE',
       },

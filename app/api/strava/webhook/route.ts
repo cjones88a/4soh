@@ -66,18 +66,18 @@ export async function POST(req: NextRequest) {
   const stage = await prisma.stage.findFirst({ where: { name: win.stageName } });
   if (!stage) return NextResponse.json({ ok: true });
 
-  const segmentIds = Object.values(SEGMENTS).filter((id) => id && id > 0);
+  const segmentIds = Object.values(SEGMENTS).filter((id) => id && id !== "0");
 
   for (const segId of segmentIds) {
-    const efforts = await fetchSegmentEfforts({ accessToken, segmentId: segId, athleteId: owner_id, startDate, endDate: new Date(startDate.getTime() + 1000 * 60 * 60 * 24) });
+    const efforts = await fetchSegmentEfforts({ accessToken, segmentId: parseInt(segId), athleteId: owner_id, startDate, endDate: new Date(startDate.getTime() + 1000 * 60 * 60 * 24) });
     for (const eff of efforts) {
       try {
         const segment = await prisma.segment.upsert({
-          where: { stravaSegmentId: eff.segment.id },
+          where: { stravaSegmentId: String(eff.segment.id) },
           update: {},
           create: {
             name: String(eff.segment.id),
-            stravaSegmentId: eff.segment.id,
+            stravaSegmentId: String(eff.segment.id),
             type: 'OVERALL',
             lane: 'NONE',
           },
