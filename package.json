@@ -7,10 +7,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "db:setup": "tsx scripts/setup-db.ts",
     "db:push": "prisma db push",
-    "db:generate": "prisma generate",
-    "fetch-strava": "tsx scripts/fetch-strava-data.ts"
+    "db:generate": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",

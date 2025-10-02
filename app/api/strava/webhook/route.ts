@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 }
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   // Simplified webhook - just return OK for now
   return NextResponse.json({ ok: true });
 }
