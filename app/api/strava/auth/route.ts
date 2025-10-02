@@ -2,12 +2,15 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const clientId = process.env.STRAVA_CLIENT_ID;
-  const redirectUri = process.env.STRAVA_REDIRECT_URI;
-  if (!clientId || !redirectUri) {
-    return NextResponse.json({ error: 'Missing STRAVA_CLIENT_ID or STRAVA_REDIRECT_URI' }, { status: 500 });
+  if (!clientId) {
+    return NextResponse.json({ error: 'Missing STRAVA_CLIENT_ID' }, { status: 500 });
   }
+  
+  // Use the current production URL directly
+  const redirectUri = 'https://race-tracker-b4zfexs2y-cjones88as-projects.vercel.app/api/strava/callback';
+  
   const params = new URLSearchParams({
-    client_id: clientId,
+    client_id: clientId.trim(),
     response_type: 'code',
     redirect_uri: redirectUri,
     approval_prompt: 'auto',
